@@ -12,8 +12,8 @@ public:
         const std::string& dstIp = "0.0.0.0");
 
     virtual std::pair<std::string,std::string> map(
-            const pcpp::IPv4Address& ip1,
-            const pcpp::IPv4Address& ip2);
+            const pcpp::IPv4Address&,
+            const pcpp::IPv4Address&);
 
 private:
     std::string mSrcIp;

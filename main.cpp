@@ -16,6 +16,7 @@
 #include "PcapFileDevice.h"
 
 #include "black_marker_anonymizer.h"
+#include "random_anonymizer.h"
 
 // Helpful source: the pcapplusplus tutorials
 
@@ -80,7 +81,9 @@ int main(int argc, char* argv[])
     }
     char* inputPcapFileName = argv[1];
     char* outputPcapFileName = argv[2];
-    BlackMarkerAnonymizer bma("10.149.10.150");
-    anonymize(inputPcapFileName, outputPcapFileName, bma);
+    // BlackMarkerAnonymizer bma("10.149.10.150");
+    // anonymize(inputPcapFileName, outputPcapFileName, bma);
+    RandomAnonymizer ra;
+    anonymize(inputPcapFileName, outputPcapFileName, ra);
     return 0;
 }
