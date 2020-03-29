@@ -9,7 +9,7 @@
 class Anonymizer
 {
 public:
-    virtual std::pair<std::string,std::string> map(
+    virtual std::pair<std::string,std::string> Map(
                 const pcpp::IPv4Address& srcIp,
                 const pcpp::IPv4Address& dstIp) = 0;
 };

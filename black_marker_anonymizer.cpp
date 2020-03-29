@@ -6,7 +6,7 @@ BlackMarkerAnonymizer::BlackMarkerAnonymizer(
 {
 }
 
-std::pair<std::string,std::string> BlackMarkerAnonymizer::map(
+std::pair<std::string,std::string> BlackMarkerAnonymizer::Map(
     const pcpp::IPv4Address&,
     const pcpp::IPv4Address&)
 {

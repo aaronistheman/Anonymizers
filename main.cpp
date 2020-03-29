@@ -54,11 +54,11 @@ void anonymize(char* inputPcapFileName,
         {
             auto oldSrcIp = ipLayer->getSrcIpAddress();
             auto oldDstIp = ipLayer->getDstIpAddress();
-            auto newIps = anonymizer.map(oldSrcIp,oldDstIp);
+            auto newIps = anonymizer.Map(oldSrcIp,oldDstIp);
             auto newSrcIp = newIps.first;
             auto newDstIp = newIps.second;
-            ipLayer->setSrcIpAddress(pcpp::IPv4Address(std::string(newSrcIp)));
-            ipLayer->setDstIpAddress(pcpp::IPv4Address(std::string(newDstIp)));
+            ipLayer->setSrcIpAddress(pcpp::IPv4Address(newSrcIp));
+            ipLayer->setDstIpAddress(pcpp::IPv4Address(newDstIp));
         }
         else
             printf("Did not anonymize packet #%d\n",numPackets);
@@ -83,7 +83,7 @@ int main(int argc, char* argv[])
     char* outputPcapFileName = argv[2];
     // BlackMarkerAnonymizer bma("10.149.10.150");
     // anonymize(inputPcapFileName, outputPcapFileName, bma);
-    RandomAnonymizer ra;
+    RandomAnonymizer ra(true);
     anonymize(inputPcapFileName, outputPcapFileName, ra);
     return 0;
 }
