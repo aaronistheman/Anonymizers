@@ -1,3 +1,11 @@
+/**
+ * Interface:
+ * arg1: input file name
+ * arg2: output file name
+ * arg3: number of packets N; the first N packets in arg1
+ *       will be copied over to arg2
+ */
+
 #include "pcap_truncator.h"
 
 #include "Packet.h"

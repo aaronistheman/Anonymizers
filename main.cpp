@@ -1,3 +1,17 @@
+/**
+ * Interface:
+ * arg1: input file name
+ * arg2: output file name
+ * arg3: indicate which anonymization method:
+ * - b = black-marker
+ * - r = random
+ * - rf = random but flow-preserving
+ * arg4: (optional)
+ * - if arg3 == b, then IP to replace src IPs with
+ * arg5: (optional)
+ * - if arg3 == b, then IP to replace dest IPs with
+ */
+
 #include <chrono>
 #include <cstdio>
 #include <cstring>
@@ -22,7 +36,7 @@
 
 void anonymize(char* inputPcapFileName,
                char* outputPcapFileName,
-               Anonymizer& anonymizer)
+               Anonymizer *anonymizer)
 {
     pcpp::IFileReaderDevice* reader =
         pcpp::IFileReaderDevice::getReader(inputPcapFileName);
@@ -54,7 +68,7 @@ void anonymize(char* inputPcapFileName,
         {
             auto oldSrcIp = ipLayer->getSrcIpAddress();
             auto oldDstIp = ipLayer->getDstIpAddress();
-            auto newIps = anonymizer.Map(oldSrcIp,oldDstIp);
+            auto newIps = anonymizer->Map(oldSrcIp,oldDstIp);
             auto newSrcIp = newIps.first;
             auto newDstIp = newIps.second;
             ipLayer->setSrcIpAddress(pcpp::IPv4Address(newSrcIp));
@@ -64,7 +78,6 @@ void anonymize(char* inputPcapFileName,
             printf("Did not anonymize packet #%d\n",numPackets);
         writer.writePacket(*(parsedPacket.getRawPacket()));
         numPackets += 1;
-        // printf("Num packets read so far: %d\n",numPackets);
     }
 
     // close the file reader, we don't need it anymore
@@ -72,18 +85,53 @@ void anonymize(char* inputPcapFileName,
     writer.close();
 }
 
-int main(int argc, char* argv[])
+int main(int argc, char *argv[])
 {
-    if (argc < 3)
+    if (argc < 4)
     {
-        fprintf(stderr,"Wrong number of arguments.\n");
+        fprintf(stderr,"Too few arguments.\n");
         return 1;
     }
-    char* inputPcapFileName = argv[1];
-    char* outputPcapFileName = argv[2];
-    // BlackMarkerAnonymizer bma("10.149.10.150");
-    // anonymize(inputPcapFileName, outputPcapFileName, bma);
-    RandomAnonymizer ra(true);
-    anonymize(inputPcapFileName, outputPcapFileName, ra);
+    char *inputPcapFileName = argv[1];
+    char *outputPcapFileName = argv[2];
+    char *anonMethod = argv[3];
+    Anonymizer *anonymizer;
+    if (!strcmp(anonMethod,"r") or !strcmp(anonMethod,"rf"))
+    {
+        if (argc != 4)
+        {
+            fprintf(stderr,"Too many arguments.\n");
+            return 1;
+        }
+    }
+    if (!strcmp(anonMethod,"b"))
+    {
+        switch (argc)
+        {
+        case 4:
+            anonymizer = new BlackMarkerAnonymizer();
+            break;
+        case 5:
+            anonymizer = new BlackMarkerAnonymizer(argv[4]);
+            break;
+        case 6:
+            anonymizer = new BlackMarkerAnonymizer(argv[4],argv[5]);
+            break;
+        default:
+            fprintf(stderr,"Too many arguments.\n");
+            return 1;
+        }
+    }
+    else if (!strcmp(anonMethod,"r"))
+        anonymizer = new RandomAnonymizer();
+    else if (!strcmp(anonMethod,"rf"))
+        anonymizer = new RandomAnonymizer(true);
+    else
+    {
+        fprintf(stderr,"Invalid anonymization method: %s\n",anonMethod);
+        return 1;
+    }
+    anonymize(inputPcapFileName, outputPcapFileName, anonymizer);
+    delete anonymizer;
     return 0;
 }
